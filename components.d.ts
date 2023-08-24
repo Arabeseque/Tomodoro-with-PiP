@@ -15,5 +15,6 @@ declare module '@vue/runtime-core' {
     TheFooter: typeof import('./src/components/TheFooter.vue')['default']
     TheInput: typeof import('./src/components/TheInput.vue')['default']
     TheVideoPlayer: typeof import('./src/components/TheVideoPlayer.vue')['default']
+    Tomodoro: typeof import('./src/components/Tomodoro.vue')['default']
   }
 }

@@ -15,11 +15,12 @@ const { log } = console
       </a>
     </p>
     <p>
-      <em text-sm op75>This iss a Demo for Chrome 116 Document in Picture</em>
+      <em text-sm op75>This is a Demo for Chrome 116 Document in Picture</em>
     </p>
 
     <div flex items-center justify-center pt-6>
-      <TheVideoPlayer />
+      <Tomodoro pt-8 />
+      <!-- <TheVideoPlayer /> -->
     </div>
   </div>
 </template>

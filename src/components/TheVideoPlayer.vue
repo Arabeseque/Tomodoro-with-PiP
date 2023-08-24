@@ -152,7 +152,7 @@ onMounted(() => {
   text-align: center;
 }
 #videoContainer::after {
-  content: "© copyright Blender Foundation | www.sintel.org";
+  content: "© copyright Rio Huang";
   color: #cdcdcd;
   text-align: center;
   margin-top: 18px;
