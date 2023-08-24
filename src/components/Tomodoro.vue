@@ -57,6 +57,39 @@ function getCurrentTime() {
   return `${formattedHour}:${formattedMinute}`
 }
 
+async function togglePiP() {
+  async function enterPiP() {
+    if (window.documentPictureInPicture.window) {
+      window.documentPictureInPicture.window.close()
+      return
+    }
+    const timer = document.querySelector('#timer') as any
+    const timerContainer = timer.parentNode as any
+    timerContainer.classList.add('pip')
+
+    const pipOptions = {
+      lockAspectRatio: true,
+      copyStyleSheets: true,
+      width: 250,
+      height: 200,
+    }
+
+    const pipWindow = await window.documentPictureInPicture.requestWindow(pipOptions)
+
+    pipWindow.addEventListener('pagehide', (event: any) => {
+      const timerContainer = document.querySelector('#timerContainer')
+      const pip = event.target.querySelector('#timer')
+      // pipVideo.classList.toggle('fullpage', false)
+      if (!timerContainer)
+        return
+      timerContainer.append(pip)
+    })
+    pipWindow.document.body.append(timer)
+  }
+
+  await enterPiP()
+}
+
 onMounted(() => {
   currentTime.value = getCurrentTime()
   setInterval(() => {
@@ -66,61 +99,76 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div>
-      Tomodoro
-    </div>
-
-    <div py-2 />
-
-    <div w-60>
-      <div flex items-end justify-between>
+  <div id="timerContainer" flex flex-col items-center justify-center>
+    <div id="timer" flex items-center justify-center pt-8>
+      <div>
         <div>
-          SESSION {{ TomodoroData.session }}/4
+          Tomodoro
         </div>
-        <div text-3xl font-400>
-          {{ currentTime }}
+
+        <div py-2 />
+
+        <div w-60>
+          <div flex items-end justify-between>
+            <div>
+              SESSION {{ TomodoroData.session }}/4
+            </div>
+            <div text-3xl font-400>
+              {{ currentTime }}
+            </div>
+          </div>
+
+          <div py-1 />
+
+          <!-- progress -->
+          <div flex flex-col gap-1>
+            <div h-3 w-full rounded-sm bg-gray-200>
+              <div
+                class="h-full rounded-sm bg-green-500"
+                :style="{ width: progressBarWidth }"
+              />
+            </div>
+            <div flex justify-between pt-1>
+              <div text-xs>
+                0
+              </div>
+              <div text-xs>
+                {{ TomodoroData.isWorking ? TomodoroData.workDuration : TomodoroData.breakDuration }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <TransitionGroup name="buttonList">
+            <button
+              key="start"
+              class="m-3 text-sm btn"
+              @click="start"
+            >
+              Go
+            </button>
+
+            <button
+              v-if="!TomodoroData.isPaused"
+
+              key="pause"
+              class="m-3 bg-gray-300 text-sm btn"
+              @click="TomodoroData.isPaused = true"
+            >
+              Pause
+            </button>
+
+            <button
+              key="pip"
+              class="m-3 bg-gray-300 text-sm btn"
+              @click="togglePiP"
+            >
+              PiP
+            </button>
+          </TransitionGroup>
         </div>
       </div>
-
-      <div py-1 />
-
-      <!-- progress -->
-      <div flex flex-col gap-1>
-        <div h-3 w-full rounded-sm bg-gray-200>
-          <div
-            class="h-full rounded-sm bg-green-500"
-            :style="{ width: progressBarWidth }"
-          />
-        </div>
-        <div flex justify-between pt-1>
-          <div text-xs>
-            0
-          </div>
-          <div text-xs>
-            {{ TomodoroData.isWorking ? TomodoroData.workDuration : TomodoroData.breakDuration }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <TransitionGroup name="buttonList">
-        <button
-          class="m-3 text-sm btn"
-          @click="start"
-        >
-          Go
-        </button>
-
-        <button
-          v-if="!TomodoroData.isPaused"
-          class="m-3 bg-gray-300 text-sm btn"
-          @click="TomodoroData.isPaused = true"
-        >
-          Pause
-        </button>
-      </TransitionGroup>
     </div>
   </div>
 </template>
@@ -140,5 +188,12 @@ onMounted(() => {
   以便能够正确地计算移动的动画。 */
   .buttonList-leave-active {
   position: absolute;
+}
+
+#timerContainer:not(:has(*))::before {
+  content: "Tomodoro is playing in Picture-in-Picture.";
+  color: #cbd5e1;
+  line-height: 360px;
+  text-align: center;
 }
 </style>
